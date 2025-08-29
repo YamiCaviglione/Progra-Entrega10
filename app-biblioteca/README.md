@@ -11,3 +11,6 @@
   googleBooks.ts     -> Funciones para llamar a la API
 /types
   index.ts           -> Tipos TS (Book, Review, etc.)
+
+## Deploy
+La app esta deployada en Vercel: https://progra-entrega10.vercel.app 
