@@ -3,15 +3,25 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Link from "next/link";
 
+// Definimos la interfaz para tipar correctamente los libros
+interface Book {
+  id: string;
+  volumeInfo: {
+    title: string;
+    authors?: string[];
+    imageLinks?: {
+      thumbnail?: string;
+    };
+  };
+}
 
 export default function Home() {
   const [query, setQuery] = useState('');
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState<Book[]>([]); // usamos Book[] en vez de any
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('title'); // title | author | isbn
 
-
-  //Buscar libros (usado por input y botón)
+  // Buscar libros usando la API de Google Books
   const buscarLibros = async (valor: string) => {
     if (valor.trim().length > 2) {
       setLoading(true);
@@ -24,7 +34,7 @@ export default function Home() {
         `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(queryParam)}`
       );
       const data = await res.json();
-      setBooks(data.items || []);
+      setBooks(data.items || []); // si no hay resultados, setBooks a array vacío
       setLoading(false);
     } else {
       setBooks([]);
@@ -32,7 +42,7 @@ export default function Home() {
     }
   };
 
-  // Sugerencias en tiempo real
+  // Sugerencias en tiempo real mientras escribimos
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
@@ -77,9 +87,9 @@ export default function Home() {
           <p className="text-gray-500 text-center">Cargando...</p>
         )}
 
-        {/* grid de libros */}
+        {/* Grid de libros */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {books.map((book: any) => {
+          {books.map((book: Book) => { // usamos Book en vez de any
             const info = book.volumeInfo;
             return (
               <Link href={`/books/${book.id}`} key={book.id}>
