@@ -24,17 +24,22 @@ npm run test:ci   # modo CI
 
 # Typecheck
 npm run typecheck
+```
 
 ## 3. Docker (opcional)
 # Loguearse en GHCR
+```bash
 echo $GITHUB_TOKEN | docker login ghcr.io -u YamiCaviglione --password-stdin
+```
 
 # Descargar imagen
+```bash
 docker pull ghcr.io/yamicaviglione/progra-entrega10:latest
-
+```
 # Ejecutar app local
+```bash
 docker run -p 3000:3000 ghcr.io/yamicaviglione/progra-entrega10:latest
-
+```
 - Abrir http://localhost:3000 para verificar la app
 
 ## 4. Variables de entorno
@@ -69,8 +74,8 @@ c. Docker a GHCR
 # Badges 
 ## Estado del proyecto
 
-![CI Build](https://github.com/YamiCaviglione/Progra-Entrega10/actions/workflows/ci-build.yml/badge.svg)
+![CI Build](https://github.com/yamicaviglione/Progra-Entrega10/actions/workflows/ci-build.yml/badge.svg)
 
-![CI Test](https://github.com/YamiCaviglione/Progra-Entrega10/actions/workflows/ci-test.yml/badge.svg)
+![CI Test](https://github.com/yamicaviglione/Progra-Entrega10/actions/workflows/ci-test.yml/badge.svg)
 
-![Docker](https://github.com/YamiCaviglione/Progra-Entrega10/pkgs/container/progra-entrega10/badge)
+![Docker](https://github.com/yamicaviglione/Progra-Entrega10/pkgs/container/progra-entrega10/badge)
