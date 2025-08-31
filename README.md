@@ -1,7 +1,7 @@
 # Plataforma de Descubrimiento y Reseñas de Libros
 
 ## 1️. URL de Producción
-[Vercel](https://progra-entrega10-6mwt.vercel.app)
+[Vercel](https://progra-entrega10.vercel.app)
 
 ## 2️. Cómo correr localmente
 ### Requisitos
