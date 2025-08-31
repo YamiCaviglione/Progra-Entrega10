@@ -33,5 +33,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/progra-entrega10:latest
-            ghcr.io/${{ github.repository_owner }}/progra-entrega10:${{ github.sha }}
+            ghcr.io/yamicaviglione/progra-entrega10:latest
+            ghcr.io/yamicaviglione/progra-entrega10:${{ github.sha }}
