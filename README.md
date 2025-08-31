@@ -16,11 +16,3 @@
 <!-- La app esta deployada en Vercel: https://progra-entrega10.vercel.app  -->
 https://progra-entrega10-6mwt.vercel.app
 
-dadsadasd
-asdasdas
-asdasdasd
-sdasdasdasd
-asdasdsa
-asdasdasd
-asdasdasd
-asdasdas
