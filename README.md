@@ -65,3 +65,12 @@ c. Docker a GHCR
 - Run de CI Build: https://github.com/YamiCaviglione/Progra-Entrega10/actions/runs/17360213881/job/49279236721
 - Run de CI Test: https://github.com/YamiCaviglione/Progra-Entrega10/actions/runs/17360213876/job/49279236699
 - Paquete GHCR: https://github.com/YamiCaviglione/Progra-Entrega10/pkgs/container/progra-entrega10 
+
+# Badges 
+## Estado del proyecto
+
+![CI Build](https://github.com/YamiCaviglione/Progra-Entrega10/actions/workflows/ci-build.yml/badge.svg)
+
+![CI Test](https://github.com/YamiCaviglione/Progra-Entrega10/actions/workflows/ci-test.yml/badge.svg)
+
+![Docker](https://github.com/YamiCaviglione/Progra-Entrega10/pkgs/container/progra-entrega10/badge)
