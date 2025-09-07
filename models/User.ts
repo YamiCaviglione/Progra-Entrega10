@@ -12,6 +12,7 @@ export interface IFavorite {
   addedAt?: Date;
 }
 
+// Definimos la interfaz (IUser) con los campos de User
 export interface IUser extends Document {
   email: string;
   passwordHash: string;
@@ -20,6 +21,8 @@ export interface IUser extends Document {
   comparePassword(candidate: string): Promise<boolean>;
   addFavorite(bookId: string, title?: string): Promise<void>;
   removeFavorite(bookId: string): Promise<void>;
+  createdAt: Date;    
+  updatedAt: Date;     
 }
 
 const FavoriteSchema = new Schema<IFavorite>({
