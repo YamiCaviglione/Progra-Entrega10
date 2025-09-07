@@ -1,0 +1,21 @@
+### Crear reseña
+POST http://localhost:3000/api/reviews/create
+Content-Type: application/json
+
+{
+  "userId": "64d8a8a1e1c123456789abcd",
+  "bookId": "12345",
+  "rating": 5,
+  "comment": "Libro espectacular"
+}
+
+### Crear voto
+POST http://localhost:3000/api/votes/create
+Content-Type: application/json
+
+{
+  "userId": "64d8a8a1e1c123456789abcd",
+  "reviewId": "64d8a8a1e1c987654321abcd",
+  "vote": 1
+}
+

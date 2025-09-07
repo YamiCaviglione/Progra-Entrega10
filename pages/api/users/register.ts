@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Validación de body con Zod
     const parsed = registerSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ error: parsed.error.errors });
+      return res.status(400).json({ error: parsed.error.issues });
     }
 
     const { email, password, name } = parsed.data;
