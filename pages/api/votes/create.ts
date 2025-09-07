@@ -1,26 +1,25 @@
 // pages/api/votes/create.ts
 // -----------------------------------------------------------
 // Endpoint para crear votos en reseñas
-// - Valida datos con Zod
-// - Un usuario solo puede votar una vez por reseña (unique index en el modelo)
-// - Maneja error 11000 si intenta votar de nuevo
+// - Requiere autenticación (JWT)
+// - Un usuario solo puede votar una vez por reseña (unique index)
 // -----------------------------------------------------------
 
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
 import { connectToDatabase } from "../../../lib/mongodb";
 import Vote from "../../../models/Vote";
 import { z } from "zod";
+import { requireAuth, AuthenticatedNextApiRequest } from "../../../lib/auth";
 
 // Esquema de validación
 const voteSchema = z.object({
-  userId: z.string().min(1, "Falta userId"),
   reviewId: z.string().min(1, "Falta reviewId"),
   vote: z.number().refine((val) => [-1, 1].includes(val), {
     message: "El voto debe ser -1 o +1",
   }),
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default requireAuth(async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
   }
@@ -33,10 +32,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: parsed.error.issues });
     }
 
-    const { userId, reviewId, vote } = parsed.data;
+    const { reviewId, vote } = parsed.data;
 
     const newVote = await Vote.create({
-      userId,
+      userId: req.user!._id,
       reviewId,
       vote,
     });
@@ -45,13 +44,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (err: any) {
     console.error("Error al crear voto:", err);
 
-    // Capturar error de índice único (ya votó)
     if (err.code === 11000) {
-      return res.status(409).json({
-        error: "El usuario ya votó esta reseña",
-      });
+      return res.status(409).json({ error: "El usuario ya votó esta reseña" });
     }
 
     return res.status(500).json({ error: "Error en el servidor" });
   }
-}
+});

@@ -18,10 +18,12 @@ export interface AuthenticatedNextApiRequest extends NextApiRequest {
  * Uso:
  * export default requireAuth(async (req, res) => { ... });
  */
-export function requireAuth(handler: (req: AuthenticatedNextApiRequest, res: NextApiResponse) => void | Promise<void>) {
+export function requireAuth(
+  handler: (req: AuthenticatedNextApiRequest, res: NextApiResponse) => void | Promise<void>
+) {
   return async (req: AuthenticatedNextApiRequest, res: NextApiResponse) => {
     try {
-      const token = req.cookies.token;
+      const token = req.cookies?.token; // ⚡ aseguro que sea opcional
       if (!token) {
         return res.status(401).json({ error: "No autorizado" });
       }
@@ -29,13 +31,19 @@ export function requireAuth(handler: (req: AuthenticatedNextApiRequest, res: Nex
       const secret = process.env.JWT_SECRET;
       if (!secret) throw new Error("JWT_SECRET no definido");
 
-      const decoded = jwt.verify(token, secret) as { id: string }; // id del user
+      // Verifico token y obtengo el id
+      const decoded = jwt.verify(token, secret) as { id: string };
+
+      // Busco usuario en DB sin passwordHash
       const user = await User.findById(decoded.id).select("-passwordHash");
-      if (!user) return res.status(401).json({ error: "Usuario no encontrado" });
+      if (!user) {
+        return res.status(401).json({ error: "Usuario no encontrado" });
+      }
 
       req.user = user;
 
-      return handler(req, res); // ejecutar endpoint
+      // Paso control al handler original
+      return handler(req, res);
     } catch (err) {
       console.error("requireAuth error:", err);
       return res.status(401).json({ error: "Token inválido" });

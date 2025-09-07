@@ -1,6 +1,10 @@
 // pages/api/users/logout.ts
 // -----------------------------------------------------------
-// Logout: borra cookie JWT
+// Endpoint para logout
+// - Borra la cookie "token" con Max-Age=0
+// - Usa HttpOnly y SameSite=Lax por seguridad
+// -----------------------------------------------------------
+
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -8,8 +12,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(405).json({ error: "Método no permitido" });
   }
 
-  // Borrar cookie
-  res.setHeader("Set-Cookie", `token=; HttpOnly; Path=/; Max-Age=0`);
+  // Borrar cookie JWT
+  res.setHeader(
+    "Set-Cookie",
+    `token=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax`
+    // ⚠ En producción conviene agregar: ; Secure
+  );
 
-  return res.status(200).json({ message: "Deslogueado correctamente" });
+  return res.status(200).json({ message: "Logout exitoso" });
 }

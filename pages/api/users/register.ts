@@ -1,66 +1,81 @@
 // pages/api/users/register.ts
 // -----------------------------------------------------------
-// Endpoint para registrar usuarios nuevos.
+// Endpoint para registro de usuarios
 // - Valida email y password con Zod
-// - Hashea la contraseña con bcrypt
-// - Crea el usuario en MongoDB usando el modelo User
-// - Devuelve el usuario creado (sin el passwordHash)
+// - Hashea contraseña antes de guardar
+// - Genera JWT y lo guarda en cookie HTTP-only
+// - Devuelve info del usuario sin passwordHash
 // -----------------------------------------------------------
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import { connectToDatabase } from "../../../lib/mongodb";
-import User from "../../../models/User";
-import bcrypt from "bcrypt";
+import User, { IUser } from "../../../models/User";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
+import jwt, { Secret, SignOptions } from "jsonwebtoken";
 
-// Esquema de validación con Zod
+// Validación con Zod
 const registerSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-  name: z.string().optional(), // opcional
+  name: z.string().optional(),
 });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Solo permitimos POST
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
   }
 
   try {
-    // Conexión a la base de datos
     await connectToDatabase();
 
-    // Validación de body con Zod
     const parsed = registerSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(400).json({ error: parsed.error.issues });
+      return res.status(400).json({ error: parsed.error.format() });
     }
 
     const { email, password, name } = parsed.data;
 
-    // Verificar si ya existe un usuario con ese email
+    // Verificar si ya existe el usuario
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ error: "El email ya está registrado" });
+      return res.status(400).json({ error: "El email ya está registrado" });
     }
 
-    // Hashear la contraseña
-    const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
+    // Hashear contraseña
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
 
     // Crear nuevo usuario
-    const newUser = await User.create({
+    const user: IUser = await User.create({
       email,
       passwordHash,
       name,
     });
 
-    // Devolver el usuario sin el hash
+    // ⚡ Crear JWT
+    const secret: Secret = process.env.JWT_SECRET as string;
+    const payload = { id: user._id.toString() };
+
+    const expiresIn: SignOptions["expiresIn"] =
+      (process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"]) || "1d";
+
+    const token = jwt.sign(payload, secret, { expiresIn });
+
+    // Guardar cookie HTTP-only
+    res.setHeader(
+      "Set-Cookie",
+      `token=${token}; HttpOnly; Path=/; Max-Age=${60 * 60 * 24}; SameSite=Lax`
+    );
+
+    // Responder usuario sin passwordHash
     return res.status(201).json({
-      id: newUser._id,
-      email: newUser.email,
-      name: newUser.name,
-      createdAt: newUser.createdAt,
+      id: user._id.toString(),
+      email: user.email,
+      name: user.name,
+      favorites: user.favorites,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     });
   } catch (err) {
     console.error("Error en registro:", err);
