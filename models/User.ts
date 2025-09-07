@@ -15,6 +15,7 @@ export interface IFavorite {
 
 // Definimos la interfaz IUser con los campos y métodos de User
 export interface IUser extends Document {
+  _id: mongoose.Types.ObjectId;   //explícitamente un ObjectId
   email: string;
   passwordHash: string;
   name?: string;
