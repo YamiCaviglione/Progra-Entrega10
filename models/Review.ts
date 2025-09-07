@@ -1,21 +1,29 @@
-// // models/Review.ts
-// import mongoose, { Schema, Document, Model } from 'mongoose';
+// models/Review.ts
+// Modelo Review: referencia a User, bookId (Google Books id), rating (1-5), comment.
+// DÓNDE: /models/Review.ts
 
-// export interface IReview extends Document {
-//   userId: string;
-//   bookId: string;
-//   rating: number;
-//   comment: string;
-//   createdAt: Date;
-//   updatedAt: Date;
-// }
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-// const ReviewSchema = new Schema<IReview>({
-//   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-//   bookId: { type: String, required: true }, // google book id
-//   rating: { type: Number, required: true, min: 1, max: 5 },
-//   comment: { type: String, required: true },
-// }, { timestamps: true });
+export interface IReview extends Document {
+  userId: mongoose.Types.ObjectId | string;
+  bookId: string;
+  rating: number;
+  comment: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-// const Review: Model<IReview> = mongoose.models.Review || mongoose.model<IReview>('Review', ReviewSchema);
-// export default Review;
+const ReviewSchema = new Schema<IReview>({
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  bookId: { type: String, required: true },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  comment: { type: String, required: true },
+}, {
+  timestamps: true,
+});
+
+// Índice único para que un mismo usuario no pueda crear muchas reseñas para el mismo libro
+ReviewSchema.index({ userId: 1, bookId: 1 }, { unique: true });
+
+const Review: Model<IReview> = (mongoose.models.Review as Model<IReview>) || mongoose.model<IReview>("Review", ReviewSchema);
+export default Review;
