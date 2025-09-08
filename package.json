@@ -13,6 +13,7 @@
     "dev:server": "nodemon --watch lib --watch models --exec \"npm run dev\""
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.87.1",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.2",
