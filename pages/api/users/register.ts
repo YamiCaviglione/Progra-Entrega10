@@ -1,10 +1,7 @@
 // pages/api/users/register.ts
 // -----------------------------------------------------------
 // Endpoint para registro de usuarios
-// - Valida email y password con Zod
-// - Hashea contraseña antes de guardar
-// - Genera JWT y lo guarda en cookie HTTP-only
-// - Devuelve info del usuario sin passwordHash
+// Refactorizado con middleware validateBody
 // -----------------------------------------------------------
 
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -13,15 +10,21 @@ import User, { IUser } from "../../../models/User";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
+import { validateBody } from "../../../lib/validate"; // ✅ nuestro middleware
 
-// Validación con Zod
+// -----------------------------------------------------------
+// 📌 1. Definir esquema de validación con Zod
+// -----------------------------------------------------------
 const registerSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
   name: z.string().optional(),
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+// -----------------------------------------------------------
+// 📌 2. Handler del endpoint (ya no valida inline)
+// -----------------------------------------------------------
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
   }
@@ -29,12 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     await connectToDatabase();
 
-    const parsed = registerSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({ error: parsed.error.format() });
-    }
-
-    const { email, password, name } = parsed.data;
+    const { email, password, name } = req.body; // ← ya validado por middleware ✅
 
     // Verificar si ya existe el usuario
     const existingUser = await User.findOne({ email });
@@ -53,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       name,
     });
 
-    // ⚡ Crear JWT
+    // Crear JWT
     const secret: Secret = process.env.JWT_SECRET as string;
     const payload = { id: user._id.toString() };
 
@@ -82,3 +80,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: "Error en el servidor" });
   }
 }
+
+// -----------------------------------------------------------
+// 📌 3. Exportar con el middleware aplicado
+// -----------------------------------------------------------
+// - validateBody recibe el schema y el handler
+// - Si el body no cumple, responde 400 automáticamente
+// -----------------------------------------------------------
+export default validateBody(registerSchema, handler);

@@ -1,8 +1,9 @@
 // pages/api/votes/create.ts
 // -----------------------------------------------------------
-// Endpoint para crear votos en reseñas
-// - Requiere autenticación (JWT)
-// - Un usuario solo puede votar una vez por reseña (unique index)
+// POST /api/votes/create
+// - Crear voto (+1/-1) para una reseña
+// - Valida body con Zod usando validateBody
+// - Requiere autenticación con JWT
 // -----------------------------------------------------------
 
 import type { NextApiResponse } from "next";
@@ -10,8 +11,9 @@ import { connectToDatabase } from "../../../lib/mongodb";
 import Vote from "../../../models/Vote";
 import { z } from "zod";
 import { requireAuth, AuthenticatedNextApiRequest } from "../../../lib/auth";
+import { validateBody } from "../../../lib/validate"; // ✅ middleware
 
-// Esquema de validación
+// ✅ Esquema de validación de body
 const voteSchema = z.object({
   reviewId: z.string().min(1, "Falta reviewId"),
   vote: z.number().refine((val) => [-1, 1].includes(val), {
@@ -19,23 +21,18 @@ const voteSchema = z.object({
   }),
 });
 
-export default requireAuth(async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Método no permitido" });
-  }
+// 🔒 Handler protegido por JWT
+async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
+  if (req.method !== "POST") return res.status(405).json({ error: "Método no permitido" });
 
   try {
     await connectToDatabase();
 
-    const parsed = voteSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({ error: parsed.error.issues });
-    }
-
-    const { reviewId, vote } = parsed.data;
+    // ⚡ req.body ya está validado por validateBody
+    const { reviewId, vote } = req.body;
 
     const newVote = await Vote.create({
-      userId: req.user!._id,
+      userId: req.user!._id, // usuario autenticado
       reviewId,
       vote,
     });
@@ -50,4 +47,7 @@ export default requireAuth(async function handler(req: AuthenticatedNextApiReque
 
     return res.status(500).json({ error: "Error en el servidor" });
   }
-});
+}
+
+// 🔗 Export con requireAuth + validateBody
+export default requireAuth(validateBody(voteSchema, handler));
