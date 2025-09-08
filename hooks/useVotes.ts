@@ -1,3 +1,4 @@
+// hooks/useVotes.ts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export interface Vote {
@@ -12,8 +13,20 @@ export interface VoteCount {
   negative: number;
 }
 
-export const useVotes = () => {
+export const useVotes = (reviewId?: string) => {
   const queryClient = useQueryClient();
+
+  // 🔹 Traer contadores
+  const { data: counts, isLoading: loadingCounts } = useQuery<VoteCount>({
+    queryKey: ["votes", reviewId],
+    queryFn: async () => {
+      if (!reviewId) return { positive: 0, negative: 0 };
+      const res = await fetch(`/api/votes/count?reviewId=${reviewId}`);
+      if (!res.ok) throw new Error("No se pudieron contar los votos");
+      return res.json();
+    },
+    enabled: !!reviewId, // solo corre si hay reviewId
+  });
 
   const createVote = useMutation<Vote, Error, { reviewId: string; vote: number }>({
     mutationFn: async ({ reviewId, vote }) => {
@@ -44,6 +57,8 @@ export const useVotes = () => {
   });
 
   return {
+    counts,
+    loadingCounts,
     createVote,
     deleteVote,
   };
