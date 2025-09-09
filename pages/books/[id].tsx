@@ -131,25 +131,26 @@ const BookPage: React.FC<Props> = ({ book }) => {
       {/* 📝 Lista reseñas */}
       <div className="mt-8">
         <h2 className="text-lg font-semibold mb-4">Reseñas de la comunidad</h2>
+
         {isLoading ? (
           <p>Cargando reseñas...</p>
         ) : error ? (
           <p className="text-red-500">Error al cargar reseñas.</p>
         ) : reviews.length === 0 ? (
-          <p className="text-gray-500">Sé el primero en reseñar este libro.</p>
+          currentUser ? (
+            <p className="text-gray-500">Sé el primero en reseñar este libro.</p>
+          ) : (
+            <p className="text-gray-500">Debes iniciar sesión para dejar una reseña.</p>
+          )
         ) : (
           <ul className="flex flex-col gap-4">
             {reviews.map((r) => (
-              <ReviewCard
-                key={r._id}
-                review={r}
-                bookId={book.id} //PASAR bookId
-              />
+              <ReviewCard key={r._id} review={r} bookId={book.id} />
             ))}
           </ul>
-
         )}
       </div>
+
     </Layout>
   );
 };
