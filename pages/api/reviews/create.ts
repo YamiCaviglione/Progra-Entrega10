@@ -17,7 +17,7 @@ import { validateBody } from "../../../lib/validate"; // ✅ nuevo import
 const reviewSchema = z.object({
   bookId: z.string().min(1, "Falta el bookId"),
   rating: z.number().min(1).max(5),
-  comment: z.string().optional(),
+  text: z.string().optional(),
 });
 
 // 🔒 Handler protegido con requireAuth
@@ -30,13 +30,15 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     await connectToDatabase();
 
     // ✅ Ya no usamos safeParse, el body ya está validado por validateBody
-    const { bookId, rating, comment } = req.body;
+    const { bookId, rating, text } = req.body;
 
     const newReview = await Review.create({
       userId: req.user!._id,
       bookId,
       rating,
-      comment,
+      text,
+      upvotes:0,
+      downvotes:0
     });
 
     return res.status(201).json(newReview);

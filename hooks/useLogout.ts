@@ -21,9 +21,14 @@ export const useLogout = () => {
       return;
     },
     onSuccess: async () => {
-      // refrescar user y redirigir a home (opcional)
-      await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-      router.push("/"); // redirige al home después del logout
+    // ⚡ limpiar cache del user inmediatamente
+    queryClient.setQueryData(["currentUser"], null);
+
+    // luego refrescar/invalidate por si acaso
+    await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+
+    router.push("/");
     },
+
   });
 };

@@ -18,7 +18,7 @@ export const loginSchema = z.object({
 export const reviewSchema = z.object({
   bookId: z.string().min(1, "Falta el bookId"),
   rating: z.number().min(1).max(5),
-  comment: z.string().min(1, "El comentario no puede estar vacío"),
+  text: z.string().min(1, "El comentario no puede estar vacío"),
 });
 
 // Votar reseña

@@ -15,6 +15,6 @@ export interface Review {
   bookId: string;
   user: string;
   rating: number;
-  comment: string;
+  text: string;
   votes: number;
 }

@@ -28,12 +28,19 @@ const Header = () => {
               <Link href="/favorites" className="hover:underline">
                 Mis Favoritos
               </Link>
+
               <button
-                onClick={() => logout.mutate()}
+                onClick={() =>
+                  logout.mutate(undefined, {
+                    onSuccess: () => console.log("Logout ok ✅"),
+                    onError: (err) => console.error("❌ Logout error:", err),
+                  })
+                }
                 className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
               >
                 Logout
               </button>
+
             </>
           ) : (
             <>

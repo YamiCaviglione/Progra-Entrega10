@@ -9,7 +9,7 @@ import { validateBody } from "../../../lib/validate"; // ✅ Middleware de valid
 // ✅ Esquema para actualizar reseña
 const updateReviewSchema = z.object({
   rating: z.number().min(1).max(5).optional(),
-  comment: z.string().optional(),
+  text: z.string().optional(),
 });
 
 // 🔒 Endpoint protegido con requireAuth
@@ -32,10 +32,10 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
 
     if (req.method === "PATCH") {
       // ✅ Gracias al middleware, req.body ya está validado
-      const { rating, comment } = req.body;
+      const { rating, text } = req.body;
 
       if (rating !== undefined) review.rating = rating;
-      if (comment !== undefined) review.comment = comment;
+      if (text !== undefined) review.text = text;
 
       await review.save();
 
