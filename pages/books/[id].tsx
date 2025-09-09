@@ -1,4 +1,3 @@
-// pages/books/[id].tsx
 import { GetServerSideProps } from "next";
 import { useState } from "react";
 import { getBookById } from "../../utils/googleBooks";
@@ -28,6 +27,11 @@ const BookPage: React.FC<Props> = ({ book }) => {
   const isFavorite = favorites.some(
     (f: { bookId: string }) => f.bookId === book.id
   );
+
+  // ✅ Saber si el usuario YA reseñó este libro
+  const userAlreadyReviewed = currentUser
+    ? reviews.some((r) => r.userId?._id === currentUser.id) // ojo: backend debe enviar _id
+    : false;
 
   const handleFavorite = () => {
     if (!currentUser) return alert("Debes iniciar sesión para agregar favoritos");
@@ -86,7 +90,7 @@ const BookPage: React.FC<Props> = ({ book }) => {
       </div>
 
       {/* ✍️ Formulario reseña */}
-      {currentUser && (
+      {currentUser && !userAlreadyReviewed && (
         <div className="mt-8 bg-gray-50 p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">Agregar Reseña</h2>
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -133,9 +137,14 @@ const BookPage: React.FC<Props> = ({ book }) => {
         ) : (
           <ul className="flex flex-col gap-4">
             {reviews.map((r) => (
-              <ReviewCard key={r._id} review={r} />
+              <ReviewCard
+                key={r._id}
+                review={r}
+                bookId={book.id} //PASAR bookId
+              />
             ))}
           </ul>
+
         )}
       </div>
     </Layout>
