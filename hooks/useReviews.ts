@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 export interface Review {
   _id: string;
   bookId: string;
-  user: { name: string; email: string };
+  userId: { name: string; email: string };
   rating: number;
   text: string;
   upvotes: number;

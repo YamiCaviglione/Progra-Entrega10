@@ -5,7 +5,7 @@ interface ReviewCardProps {
     _id: string;
     text: string;
     rating: number;
-    user?: { name: string }; // 👈 user puede venir undefined
+    userId: { name: string }; // ✅ siempre presente (porque solo usuarios logueados reseñan)
   };
 }
 
@@ -15,10 +15,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
   return (
     <li className="bg-white p-4 rounded shadow flex flex-col">
       <div className="flex items-center gap-2 mb-2">
-        {/* 👇 fallback si no hay user */}
-        <span className="font-bold">
-          {review.user?.name || "Usuario anónimo"}
-        </span>
+        <span className="font-bold">{review.userId.name}</span>
         <span className="text-yellow-500">
           {"★".repeat(review.rating)}
           {"☆".repeat(5 - review.rating)}
