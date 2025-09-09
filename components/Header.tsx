@@ -12,7 +12,7 @@ const Header = () => {
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo o nombre de la app */}
         <Link href="/">
-          <span className="font-bold text-lg cursor-pointer">📚 Mi Biblioteca</span>
+          <span className="font-bold text-lg cursor-pointer">Libroteca</span>
         </Link>
 
         <nav className="flex items-center space-x-4">
@@ -29,6 +29,10 @@ const Header = () => {
                 Mis Favoritos
               </Link>
 
+              <Link href="/profile" className="hover:underline">
+                Mi Perfil
+              </Link>
+
               <button
                 onClick={() =>
                   logout.mutate(undefined, {
@@ -40,7 +44,6 @@ const Header = () => {
               >
                 Logout
               </button>
-
             </>
           ) : (
             <>

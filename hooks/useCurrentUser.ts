@@ -1,20 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
 
-export interface User {
+export type CurrentUser = {
   id: string;
   email: string;
   name: string;
   favorites: string[];
-}
+  createdAt?: string; //opcional para no romper TS
+  updatedAt?: string;
+};
 
-export const useCurrentUser = () => {
-  return useQuery<User, Error>({
+export function useCurrentUser() {
+  return useQuery<CurrentUser | null>({
     queryKey: ["currentUser"],
     queryFn: async () => {
       const res = await fetch("/api/users/me");
-      if (!res.ok) throw new Error("No autorizado");
+      if (res.status === 401) return null; // no logueado
+      if (!res.ok) throw new Error("Error al obtener usuario actual");
       return res.json();
     },
     retry: false,
   });
-};
+}
