@@ -9,12 +9,14 @@ interface Props {
 
 const BookCard: React.FC<Props> = ({ book }) => {
   const { data: currentUser } = useCurrentUser();
-  const { favorites = [], addFavorite, removeFavorite } = useFavorites();
+  const { favorites = [], addFavorite, removeFavorite } = useFavorites(currentUser);
 
   // Ver si el libro está en favoritos
   const isFavorite = favorites.some(
     (f: { bookId: string; title?: string }) => f.bookId === book.id
   );
+
+  
 
   // Toggle favorito usando mutate de React Query
   const toggleFavorite = () => {

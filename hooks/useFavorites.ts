@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 type Favorite = { bookId: string; title?: string };
 
-export const useFavorites = () => {
+export const useFavorites = (currentUser: any) => {
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery<Favorite[], Error>({
@@ -11,8 +11,9 @@ export const useFavorites = () => {
       const res = await fetch("/api/users/favorites");
       if (!res.ok) throw new Error("Error al obtener favoritos");
       const json = await res.json();
-      return json.favorites; // <-- debe ser array de objetos
+      return json.favorites;
     },
+    enabled: !!currentUser, // ✅ Solo corre si hay usuario logueado
   });
 
   const addFavorite = useMutation<any, Error, Favorite>({

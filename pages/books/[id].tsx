@@ -16,7 +16,7 @@ interface Props {
 const BookPage: React.FC<Props> = ({ book }) => {
   const router = useRouter();
   const { data: currentUser } = useCurrentUser();
-  const { favorites = [], addFavorite, removeFavorite } = useFavorites();
+  const { favorites = [], addFavorite, removeFavorite } = useFavorites(currentUser);
   const { reviews, isLoading, error, addReview } = useReviews(book?.id ?? "");
 
   const [rating, setRating] = useState(5);
@@ -76,16 +76,19 @@ const BookPage: React.FC<Props> = ({ book }) => {
           </p>
 
           {/* ❤️ Favoritos */}
-          <button
-            onClick={handleFavorite}
-            className={`mt-2 px-3 py-1 rounded ${
-              isFavorite
-                ? "bg-red-500 text-white"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-          >
-            {isFavorite ? "❤️ Quitar favorito" : "🤍 Agregar favorito"}
-          </button>
+          {currentUser && (
+            <button
+              onClick={handleFavorite}
+              className={`mt-2 px-3 py-1 rounded ${
+                isFavorite
+                  ? "bg-red-500 text-white"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+            >
+              {isFavorite ? "❤️ Quitar favorito" : "🤍 Agregar favorito"}
+            </button>
+          )}
+
         </div>
       </div>
 
