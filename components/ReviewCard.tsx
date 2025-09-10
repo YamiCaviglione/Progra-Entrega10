@@ -1,3 +1,4 @@
+// components/ReviewCard.tsx
 import { useState } from "react";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useReviews } from "../hooks/useReviews";
@@ -23,7 +24,15 @@ export default function ReviewCard({ review, bookId }: ReviewCardProps) {
   const [text, setText] = useState(review.text);
   const [rating, setRating] = useState(review.rating);
 
-  const isOwner = currentUser?.id === review.userId._id;
+  // ------------------------------------------------------------------
+  // CORRECCIÓN IMPORTANTE:
+  // - useCurrentUser devuelve `id` (string) según tu tipo CurrentUser.
+  // - review.userId._id viene de Mongo (ObjectId o string). Convertimos a string.
+  // - Comparamos currentUser?.id con String(review.userId._id).
+  //
+  // Esto evita el error TS: "Property '_id' does not exist on type 'CurrentUser'".
+  // ------------------------------------------------------------------
+  const isOwner = !!currentUser && String(review.userId._id) === currentUser.id;
 
   return (
     <li className="bg-white p-4 rounded shadow flex flex-col">
@@ -73,20 +82,25 @@ export default function ReviewCard({ review, bookId }: ReviewCardProps) {
       )}
 
       <div className="flex items-center gap-4 text-sm">
-        <button
-          className="px-2 py-1 rounded bg-green-100 hover:bg-green-200"
-          onClick={() => createVote.mutate({ reviewId: review._id, vote: 1 })}
-          disabled={loadingCounts}
-        >
-          👍 {counts?.positive ?? 0}
-        </button>
-        <button
-          className="px-2 py-1 rounded bg-red-100 hover:bg-red-200"
-          onClick={() => createVote.mutate({ reviewId: review._id, vote: -1 })}
-          disabled={loadingCounts}
-        >
-          👎 {counts?.negative ?? 0}
-        </button>
+        {/* 👍👎 SOLO si el usuario está logueado y NO es dueño */}
+        {currentUser && !isOwner && (
+          <>
+            <button
+              className="px-2 py-1 rounded bg-green-100 hover:bg-green-200"
+              onClick={() => createVote.mutate({ reviewId: review._id, vote: 1 })}
+              disabled={loadingCounts}
+            >
+              👍 {counts?.positive ?? 0}
+            </button>
+            <button
+              className="px-2 py-1 rounded bg-red-100 hover:bg-red-200"
+              onClick={() => createVote.mutate({ reviewId: review._id, vote: -1 })}
+              disabled={loadingCounts}
+            >
+              👎 {counts?.negative ?? 0}
+            </button>
+          </>
+        )}
 
         {/* Botones solo para el dueño */}
         {isOwner && !editing && (

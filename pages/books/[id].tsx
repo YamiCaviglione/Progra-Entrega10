@@ -8,6 +8,7 @@ import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { useFavorites } from "../../hooks/useFavorites";
 import { useReviews } from "../../hooks/useReviews";
 import ReviewCard from "../../components/ReviewCard";
+import toast from "react-hot-toast";
 
 interface Props {
   book: Book | null;
@@ -34,7 +35,10 @@ const BookPage: React.FC<Props> = ({ book }) => {
     : false;
 
   const handleFavorite = () => {
-    if (!currentUser) return alert("Debes iniciar sesión para agregar favoritos");
+    if (!currentUser) {
+      toast.error("Debes iniciar sesión para agregar favoritos");
+      return;
+    }
 
     if (isFavorite) removeFavorite.mutate(book.id);
     else addFavorite.mutate({ bookId: book.id, title: book.title });
@@ -79,18 +83,26 @@ const BookPage: React.FC<Props> = ({ book }) => {
           {currentUser && (
             <button
               onClick={handleFavorite}
+              disabled={addFavorite.isPending || removeFavorite.isPending} // ⏳ bloquea mientras carga
               className={`mt-2 px-3 py-1 rounded ${
                 isFavorite
                   ? "bg-red-500 text-white"
                   : "bg-gray-200 hover:bg-gray-300"
-              }`}
+              } ${addFavorite.isPending || removeFavorite.isPending ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              {isFavorite ? "❤️ Quitar favorito" : "🤍 Agregar favorito"}
+              {addFavorite.isPending || removeFavorite.isPending
+                ? "Procesando..."
+                : isFavorite
+                ? "❤️ Quitar favorito"
+                : "🤍 Agregar favorito"}
             </button>
           )}
 
         </div>
       </div>
+      {/* quiero votar mi propia resena y me aparece error 405 (creo q esta bien porq desde el back no me deberia dejar votar mi propia resena). pero en ese caso ni siquiera tendrian 
+      que aparecer los dos botones de like y dislike si la resena es mia. solo deben aparecer si la resena es ajena y el usuario esta autenticado. decime que codigos necesitas que te pase y pasame el codigo comentado e indicando ubicacion. sin romper nada de lo
+      que ya tengo porfi :)  */}
 
       {/* ✍️ Formulario reseña */}
       {currentUser && !userAlreadyReviewed && (

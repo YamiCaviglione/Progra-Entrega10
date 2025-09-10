@@ -21,13 +21,18 @@ export const useVotes = (reviewId?: string) => {
     queryKey: ["votes", reviewId],
     queryFn: async () => {
       if (!reviewId) return { positive: 0, negative: 0 };
-      const res = await fetch(`/api/votes/count?reviewId=${reviewId}`);
+
+      const res = await fetch(`/api/votes?reviewId=${reviewId}`);
       if (!res.ok) throw new Error("No se pudieron contar los votos");
-      return res.json();
+
+      const json = await res.json();
+      // ⚡ Extraemos voteCount del JSON
+      return json.voteCount as VoteCount;
     },
     enabled: !!reviewId, // solo corre si hay reviewId
   });
 
+  // ➕➖ Crear o toggle voto
   const createVote = useMutation<Vote, Error, { reviewId: string; vote: number }>({
     mutationFn: async ({ reviewId, vote }) => {
       const res = await fetch("/api/votes/create", {
@@ -39,20 +44,8 @@ export const useVotes = (reviewId?: string) => {
       return res.json();
     },
     onSuccess: (_, variables) => {
+      // 🔄 Refrescar el conteo después de votar
       queryClient.invalidateQueries({ queryKey: ["votes", variables.reviewId] });
-    },
-  });
-
-  const deleteVote = useMutation<any, Error, string>({
-    mutationFn: async (voteId) => {
-      const res = await fetch(`/api/votes/${voteId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("No se pudo eliminar voto");
-      return res.json();
-    },
-    onSuccess: (_, voteId) => {
-      queryClient.invalidateQueries({ queryKey: ["votes", voteId] });
     },
   });
 
@@ -60,6 +53,5 @@ export const useVotes = (reviewId?: string) => {
     counts,
     loadingCounts,
     createVote,
-    deleteVote,
   };
 };

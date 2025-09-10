@@ -1,3 +1,11 @@
+TO DO:
+- toasts
+- tests
+- validacion zod??? verificar
+- mockear bdd
+- optimizar
+
+
 # Plataforma de Descubrimiento y Reseñas de Libros
 
 ## 1️. URL de Producción
