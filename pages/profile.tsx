@@ -56,6 +56,16 @@ export default function ProfilePage() {
           </ul>
         )}
       </div>
+
+      {/* 🔙 Botón para volver al inicio */}
+      <div className="mt-6">
+          <Link
+          href="/"
+          className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+          ⬅ Volver al inicio
+          </Link>
+      </div>      
     </div>
   );
 }
