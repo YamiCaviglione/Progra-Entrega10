@@ -1,9 +1,15 @@
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useUserReviews } from "../hooks/useUserReviews";
+import { useBookTitles } from "../hooks/useBookTitle"; // 👈 nuevo import
+import Link from "next/link";
 
 export default function ProfilePage() {
   const { data: user, isLoading: userLoading } = useCurrentUser();
   const { data: reviews, isLoading: reviewsLoading } = useUserReviews();
+
+  // 📚 cargar títulos de todos los bookIds
+  const bookIds = reviews?.map((r: any) => r.bookId) || [];
+  const { data: titles } = useBookTitles(bookIds);
 
   if (userLoading) return <p className="p-4">Cargando perfil...</p>;
   if (!user) return <p className="p-4">Debes iniciar sesión para ver tu perfil.</p>;
@@ -33,8 +39,15 @@ export default function ProfilePage() {
           <ul className="space-y-4">
             {reviews.map((r: any) => (
               <li key={r._id} className="border-b pb-4">
-                <p className="font-semibold">Libro: {r.bookId}</p>
-                <p className="text-gray-700">{r.comment}</p>
+                {/* 🔗 Link al detalle del libro */}
+                <Link
+                  href={`/books/${r.bookId}`}
+                  className="font-semibold text-blue-600 hover:underline"
+                >
+                  {titles?.[r.bookId] || r.bookId}
+                </Link>
+
+                <p className="text-gray-700">{r.text}</p>
                 <p className="text-sm text-gray-400">
                   Publicado: {new Date(r.createdAt).toLocaleDateString()}
                 </p>
