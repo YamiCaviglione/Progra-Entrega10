@@ -4,9 +4,12 @@ import { useFavorites } from "../hooks/useFavorites";
 import Layout from "../components/Layout";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useCurrentUser } from "../hooks/useCurrentUser"; 
+
 
 export default function FavoritesPage() {
-  const { favorites = [], isLoading } = useFavorites();
+  const { data: currentUser, isLoading: loadingUser } = useCurrentUser(); //trae el user
+  const { favorites = [], isLoading } = useFavorites(currentUser); //lo pasamos al hook
   const router = useRouter();
 
   if (isLoading)
@@ -17,6 +20,14 @@ export default function FavoritesPage() {
     );
   //   if (error) return <Layout><p>Error al cargar favoritos.</p></Layout>;
 
+  if (!currentUser) {
+    return (
+      <Layout>
+        <p>No estás logueado. <Link href="/login">Iniciar sesión</Link></p>
+      </Layout>
+    );
+  }
+  
   return (
     <Layout>
       <div className="flex items-center justify-between mb-4">
