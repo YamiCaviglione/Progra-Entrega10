@@ -14,6 +14,11 @@ if (!cached) {
 }
 
 export async function connectToDatabase() {
+  // 🔹 Si ya hay una conexión activa, usarla
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
   if (cached.conn) {
     return cached.conn;
   }

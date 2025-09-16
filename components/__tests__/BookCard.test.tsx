@@ -1,7 +1,30 @@
 //components/__tests__/BookCard.test.tsx
 import { render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { vi } from "vitest";
 import BookCard from "../BookCard";
 import { describe, it, expect } from "vitest";
+
+// Mock de useCurrentUser para que no falle
+vi.mock("../../hooks/useCurrentUser", () => ({
+  useCurrentUser: () => ({ data: null, isLoading: false })
+}));
+
+// Crear un QueryClient para los tests
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  );
+}
 
 // Creamos un "Book" que cumple con lo que espera tu interfaz
 const mockBook = {
@@ -17,7 +40,7 @@ const mockBook = {
 
 describe("BookCard", () => {
   it("muestra título, autor e imagen", () => {
-    render(<BookCard book={mockBook} />);
+    render(<BookCard book={mockBook} />, { wrapper: createWrapper() });
 
     expect(screen.getByText("Harry Potter")).toBeInTheDocument();
     expect(screen.getByText("J.K. Rowling")).toBeInTheDocument();
@@ -28,7 +51,7 @@ describe("BookCard", () => {
   });
 
   it("tiene link a la página de detalles", () => {
-    render(<BookCard book={mockBook} />);
+    render(<BookCard book={mockBook} />, { wrapper: createWrapper() });
     const link = screen.getByRole("link", { name: /ver detalles/i });
     expect(link).toHaveAttribute("href", "/books/123");
   });
@@ -40,7 +63,7 @@ describe("BookCard", () => {
         image: "/no-image.png", // así como lo arma googleBooks.ts
     };
 
-    render(<BookCard book={mockBookSinImagen} />);
+    render(<BookCard book={mockBookSinImagen} />, { wrapper: createWrapper() });
 
     const img = screen.getByAltText("Harry Potter");
     expect(img).toHaveAttribute("src", "/no-image.png");
