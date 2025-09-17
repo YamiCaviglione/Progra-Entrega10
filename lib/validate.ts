@@ -4,8 +4,8 @@ import { ZodSchema } from "zod";
 import { AuthenticatedNextApiRequest } from "./auth";
 
 // ✅ Versión simple: recibe schema y handler juntos
-export function validateBody(
-  schema: ZodSchema<any>,
+export function validateBody<T>(
+  schema: ZodSchema<T>,
   handler: (req: AuthenticatedNextApiRequest, res: NextApiResponse) => void | Promise<void>
 ) {
   return async (req: AuthenticatedNextApiRequest, res: NextApiResponse) => {

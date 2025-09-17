@@ -8,7 +8,7 @@ import { useCurrentUser } from "../hooks/useCurrentUser";
 
 
 export default function FavoritesPage() {
-  const { data: currentUser, isLoading: loadingUser } = useCurrentUser(); //trae el user
+  const { data: currentUser } = useCurrentUser(); //trae el user
   const { favorites = [], isLoading } = useFavorites(currentUser); //lo pasamos al hook
   const router = useRouter();
 

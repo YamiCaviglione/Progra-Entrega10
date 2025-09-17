@@ -8,7 +8,7 @@ export default function ProfilePage() {
   const { data: reviews, isLoading: reviewsLoading } = useUserReviews();
 
   // 📚 cargar títulos de todos los bookIds
-  const bookIds = reviews?.map((r: any) => r.bookId) || [];
+  const bookIds = reviews?.map((r: { bookId: string }) => r.bookId) || [];
   const { data: titles } = useBookTitles(bookIds);
 
   if (userLoading) return <p className="p-4">Cargando perfil...</p>;
@@ -37,7 +37,7 @@ export default function ProfilePage() {
           <p className="text-gray-500">Todavía no escribiste ninguna reseña.</p>
         ) : (
           <ul className="space-y-4">
-            {reviews.map((r: any) => (
+            {reviews.map((r: { _id: string; bookId: string; text: string; rating: number; createdAt: string }) => (
               <li key={r._id} className="border-b pb-4">
                 {/* 🔗 Link al detalle del libro */}
                 <Link

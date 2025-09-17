@@ -19,11 +19,14 @@ function createWrapper() {
     },
   });
 
-  return ({ children }: { children: React.ReactNode }) => (
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
       {children}
     </QueryClientProvider>
   );
+  
+  Wrapper.displayName = 'QueryWrapper';
+  return Wrapper;
 }
 
 // Creamos un "Book" que cumple con lo que espera tu interfaz

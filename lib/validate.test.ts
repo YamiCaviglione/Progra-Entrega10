@@ -13,7 +13,7 @@ import type { NextApiResponse } from 'next';
 
 // 🔹 Crear mock de response
 const createMockResponse = (): Partial<NextApiResponse> => {
-  const res: any = {
+  const res: Partial<NextApiResponse> = {
     status: vi.fn().mockReturnThis(),
     json: vi.fn().mockReturnThis(),
   };
@@ -21,7 +21,7 @@ const createMockResponse = (): Partial<NextApiResponse> => {
 };
 
 // 🔹 Crear mock de request
-const createMockRequest = (body: any = {}): Partial<AuthenticatedNextApiRequest> => ({
+const createMockRequest = (body: unknown = {}): Partial<AuthenticatedNextApiRequest> => ({
   method: 'POST',
   body,
   headers: { 'content-type': 'application/json' }

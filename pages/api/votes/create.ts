@@ -60,7 +60,7 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     });
 
     return res.status(201).json(newVote);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error al crear voto:", err);
     return res.status(500).json({ error: "Error en el servidor" });
   }

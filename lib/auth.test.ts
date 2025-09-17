@@ -5,7 +5,7 @@
 // - Casos de error: sin token, token inválido, usuario no existe
 // -----------------------------------------------------------
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, Mock } from 'vitest';
 import jwt from 'jsonwebtoken';
 import { requireAuth, AuthenticatedNextApiRequest } from './auth';
 import User from '../models/User';
@@ -31,17 +31,9 @@ vi.mock('../models/User', () => ({
   }
 }));
 
-// 🔹 Helper function para crear usuarios de test
-const createTestUser = (userData: any) => ({
-  _id: '507f1f77bcf86cd799439011',
-  email: userData.email,
-  name: userData.name,
-  toObject: () => ({ _id: '507f1f77bcf86cd799439011', ...userData })
-});
-
 // 🔹 Crear mock de response
 const createMockResponse = (): Partial<NextApiResponse> => {
-  const res: any = {
+  const res: Partial<NextApiResponse> = {
     status: vi.fn().mockReturnThis(),
     json: vi.fn().mockReturnThis(),
   };
@@ -50,7 +42,7 @@ const createMockResponse = (): Partial<NextApiResponse> => {
 
 // 🔹 Crear mock de request
 const createMockRequest = (
-  cookies: any = {}, 
+  cookies: Record<string, string> = {}, 
   method = 'GET'
 ): Partial<AuthenticatedNextApiRequest> => ({
   method,
@@ -84,7 +76,7 @@ describe('lib/auth.ts - requireAuth middleware', () => {
       );
       
       // Mock User.findById para retornar usuario
-      (User.findById as any).mockReturnValue({
+      (User.findById as Mock).mockReturnValue({
         select: vi.fn().mockResolvedValue(testUser)
       });
       
@@ -152,7 +144,7 @@ describe('lib/auth.ts - requireAuth middleware', () => {
       );
       
       // Mock User.findById para retornar null (usuario no existe)
-      (User.findById as any).mockReturnValue({
+      (User.findById as Mock).mockReturnValue({
         select: vi.fn().mockResolvedValue(null)
       });
       
@@ -198,7 +190,7 @@ describe('lib/auth.ts - requireAuth middleware', () => {
       );
       
       // Mock User.findById para lanzar error de DB
-      (User.findById as any).mockReturnValue({
+      (User.findById as Mock).mockReturnValue({
         select: vi.fn().mockRejectedValue(new Error('Database error'))
       });
       

@@ -20,8 +20,11 @@ export default function RegisterPage() {
       await register.mutateAsync({ email, password, name });
       // onSuccess de useRegister invalida currentUser → usuario queda logueado
       router.push("/");
-    } catch (err: any) {
-      setErrorMsg(err?.message || "Error en el registro");
+    } catch (err: unknown) {
+      const message = err && typeof err === 'object' && 'message' in err 
+        ? String(err.message) 
+        : "Error en el registro";
+      setErrorMsg(message);
     }
   };
 

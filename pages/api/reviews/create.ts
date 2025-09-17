@@ -42,10 +42,10 @@ async function handler(req: AuthenticatedNextApiRequest, res: NextApiResponse) {
     });
 
     return res.status(201).json(newReview);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error al crear reseña:", err);
 
-    if (err.code === 11000) {
+    if (err && typeof err === 'object' && 'code' in err && err.code === 11000) {
       return res.status(409).json({
         error: "El usuario ya tiene una reseña para este libro",
       });

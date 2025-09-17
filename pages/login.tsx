@@ -19,8 +19,11 @@ export default function LoginPage() {
       await login.mutateAsync({ email, password });
       // si todo OK, useLogin invalida currentUser → redirijo
       router.push("/");
-    } catch (err: any) {
-      setErrorMsg(err?.message || "Error en login");
+    } catch (err: unknown) {
+      const message = err && typeof err === 'object' && 'message' in err 
+        ? String(err.message) 
+        : "Error en login";
+      setErrorMsg(message);
     }
   };
 

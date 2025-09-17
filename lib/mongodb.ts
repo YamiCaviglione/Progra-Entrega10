@@ -6,11 +6,21 @@ if (!MONGODB_URI) {
   throw new Error("⚠️ Definí MONGODB_URI en tu archivo .env.local");
 }
 
+// Interfaz para el cache global
+interface GlobalCache {
+  mongoose?: {
+    conn: typeof mongoose | null;
+    promise: Promise<typeof mongoose> | null;
+  };
+}
+
 // Para evitar múltiples conexiones en dev (Next.js recarga mucho)
-let cached = (global as any).mongoose;
+const globalForMongoose = globalThis as unknown as GlobalCache;
+
+let cached = globalForMongoose.mongoose;
 
 if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+  cached = globalForMongoose.mongoose = { conn: null, promise: null };
 }
 
 export async function connectToDatabase() {
@@ -19,16 +29,16 @@ export async function connectToDatabase() {
     return mongoose.connection;
   }
 
-  if (cached.conn) {
-    return cached.conn;
+  if (cached!.conn) {
+    return cached!.conn;
   }
 
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
+  if (!cached!.promise) {
+    cached!.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
       console.log("✅ Conectado a MongoDB");
       return mongoose;
     });
   }
-  cached.conn = await cached.promise;
-  return cached.conn;
+  cached!.conn = await cached!.promise;
+  return cached!.conn;
 }
